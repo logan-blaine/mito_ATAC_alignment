@@ -1,0 +1,2 @@
+sample_file: samples_test.txt
+reference: ref/hg38.fa

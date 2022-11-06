@@ -1,0 +1,9 @@
+.snakemake
+fasta
+logs
+mapped
+mt-bam
+processed
+raw
+ref
+/*.txt
