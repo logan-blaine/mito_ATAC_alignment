@@ -33,7 +33,7 @@ rule samtools_markdup:
     params:
         tmpdir = '/tmp'
     resources:
-        mem_mb =2000
+        mem_mb = 4000
     threads: 3
     shell:
         "samtools fixmate -m {input} -"
