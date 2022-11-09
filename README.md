@@ -1,12 +1,17 @@
 # Alignment + preprocessing workflow for SHARE-seq data
 
-This project uses Snakemake to align and extract mitochondrial reads + cell barcodes from raw scATAC/SHARE-seq read data whose naming conventions match the ones from https://github.com/masai1116/SHARE-seq-alignmentV2. Compatible with downstream use of [mgatk](https://github.com/caleblareau/mgatk).
+This project uses Snakemake to align mitochondrial reads and extract cell barcodes from scATAC/SHARE-seq read data processed using [Sai Ma's pipeline](https://github.com/masai1116/SHARE-seq-alignmentV2). Compatible with downstream use of [my mgatk fork](https://github.com/logan-blaine/mgatk).
 
 ## Usage examples
 
-Run pipeline locally with 16 cores
+Run pipeline locally with 16 cores (alignment workflow only)
 ```
 snakemake --cores 16
+```
+
+Run pipeline locally with 16 cores (alignment workflow + mgatk)
+```
+snakemake --cores 16 all
 ```
 
 ## Inputs
@@ -17,8 +22,6 @@ snakemake --cores 16
 - A reference genome indexed with `bwa index`
     - Preferably with nuclear regions w/ mito homology [blacklisted](https://github.com/caleblareau/mitoblacklist)
 - A config file `config.yaml` pointing to the sample file and reference genome (see example in repo)
-
-This project uses Snakemake to perform alignment + preprocessing of scATAC (or [SHARE-seq](https://github.com/masai1116/SHARE-seq-alignmentV2/)) data, ideally for use with [my off-label mgatk fork](https://github.com/logan-blaine/mgatk/tree/barcode_fix)
 
 ## Outputs
 - Aligned `.bam` files processed as follows:
