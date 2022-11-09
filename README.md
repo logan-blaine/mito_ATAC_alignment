@@ -1,6 +1,6 @@
-# Single-cell ATAC alignment + preprocessing for mgatk
+# Alignment + preprocessing workflow for SHARE-seq data
 
-This project uses Snakemake to perform mtDNA alignment + preprocessing of scATAC (or SHARE-seq) data based on the naming conventions from https://github.com/masai1116/SHARE-seq-alignmentV2. Compatible with downstream use of [mgatk](https://github.com/caleblareau/mgatk).
+This project uses Snakemake to align and extract mitochondrial reads + cell barcodes from raw scATAC/SHARE-seq read data whose naming conventions match the ones from https://github.com/masai1116/SHARE-seq-alignmentV2. Compatible with downstream use of [mgatk](https://github.com/caleblareau/mgatk).
 
 ## Usage examples
 
