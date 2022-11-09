@@ -1,26 +1,35 @@
 # Single-cell ATAC alignment + preprocessing for mgatk
 
-This project uses Snakemake to perform alignment + preprocessing of scATAC (or [SHARE-seq](https://github.com/masai1116/SHARE-seq-alignmentV2/)) data, ideally for use with [mgatk](https://github.com/caleblareau/mgatk).
+This project uses Snakemake to perform mtDNA alignment + preprocessing of scATAC (or SHARE-seq) data based on the naming conventions from https://github.com/masai1116/SHARE-seq-alignmentV2. Compatible with downstream use of [mgatk](https://github.com/caleblareau/mgatk).
 
-## Requirements
+## Usage examples
 
-Version numbers below are recommended.
+Run pipeline locally with 16 cores
 ```
-samtools >= 1.16
-snakemake >= 7.17.1
-bwa-mem >= 0.7.17
-GNU awk >= 5.0.1
+snakemake --cores 16
 ```
-
 
 ## Inputs
-- `.fastq` files containing paired-end reads from each sequencing run
-    - Cell barcodes are taken from the each read name as everything after the '_'
-- a reference genome
-    - preferably with nuclear regions w/ mito homology [blacklisted](https://github.com/caleblareau/mitoblacklist)
+- A folder of `.fastq` files containing paired-end reads from each sequencing run (folder name = `raw`) 
+    - For each sample, files must be named "raw/{sample}.R1.fastq.gz", "raw/{sample}.R2.fastq.gz"
+    - Cell barcodes extracted from each read name, currently everything after the '_'
+- A file containing a list of sample names, one sample per line (e.g. `samples.txt`)
+- A reference genome indexed with `bwa index`
+    - Preferably with nuclear regions w/ mito homology [blacklisted](https://github.com/caleblareau/mitoblacklist)
+- A config file `config.yaml` pointing to the sample file and reference genome (see example in repo)
 
 ## Outputs
-- Aligned `.bam` files
-    - Duplicates removed
+- Aligned `.bam` files processed as follows:
     - Reads aligning to chrM only
-    - Barcodes present in the 'CB' tag
+    - Barcodes extracted to the 'CB' tag
+    - Reads by read position and indexed
+    - Duplicate reads removed (same barcode and 5' start positions)
+    
+## Requirements
+Version numbers below are recommended.
+```
+samtools >= 1.16.1
+snakemake >= 7.17.1
+bwa-mem >= 0.7.17
+awk (gawk) >= 5.0.1
+```
