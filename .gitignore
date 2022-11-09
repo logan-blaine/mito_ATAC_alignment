@@ -1,4 +1,4 @@
-.snakemake
+.snakemake/
 fasta
 logs
 mapped
@@ -7,3 +7,7 @@ processed
 raw
 ref
 /*.txt
+.Rproj.user
+mgatk-output/
+*.pdf 
+*.nb.html

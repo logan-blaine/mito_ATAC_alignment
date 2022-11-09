@@ -6,6 +6,8 @@ with open(sample_file) as f:
 
 rule all:
     input: expand('mt-bam/{sample}.bam', sample=SAMPLES)
+    # input: expand('mgatk-output/{sample}/final/mgatk.rds', sample=SAMPLES)
+    # input: expand('mgatk-output/{sample}/final/barcodeQuants.tsv', sample=SAMPLES)
 
 rule bwa_mem_chrM:
     input:
@@ -40,3 +42,22 @@ rule samtools_markdup:
         " | samtools sort -m {resources.mem_mb}M -T {params.tmpdir} -"
         " | samtools markdup -r --barcode-tag CB - {output.bam}"
         " && samtools index {output}"
+
+# in progress: run mgatk on each sample 
+rule mgatk_bcall:
+    input:
+        "mt-bam/{sample}.bam"
+    output:
+        directory("mgatk-output/{sample}"), 
+        "mgatk-output/{sample}/final/barcodeQuants.tsv"
+    params:
+        genome=config['genome'],
+        outdir = lambda wildcards, output: output[0],
+        min_barcodes=config['min_barcodes'] if 'min_barcodes' in config else 100,
+        barcodes=f'-b {config["barcodes"]}' if 'barcodes' in config else '',
+        num_samples='-ns 512'
+    threads: 1
+    shell:
+        "mgatk bcall -i {input} -o {params.outdir} -bt CB"
+        " -mb {params.min_barcodes} {params.barcodes} {params.num_samples}"
+        " -g {params.genome} -kd -c {threads}"

@@ -1,0 +1,69 @@
+---
+title: "Human BMMC SHARE-seq mtDNA coverage stats"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+```{r}
+library(readr)
+library(dplyr)
+library(purrr)
+library(ggplot2)
+```
+
+Read cell metadata
+```{r eval=FALSE, include=FALSE}
+cell_meta = read.table('processed/human_BMMC_ATAC_cell_meta.tsv.gz')
+head(cell_meta)
+```
+
+```{r eval=FALSE, include=FALSE}
+cell_meta %>% filter(donor=='donor2') %>% tail()
+```
+
+
+Read in the cell barcodes from the original pipeline run 
+```{r}
+barcodes = read_tsv('barcodes.txt', col_names = c('barcode'))
+head(barcodes)
+```
+
+Read the names of samples that were re-processed
+```{r}
+samples = read_lines("samples.txt")
+```
+
+Get barcode counts by sample 
+```{r}
+read_sample_barcodes = function(sample){
+  quants_file = sprintf('mgatk-output/%s/final/barcodeQuants.tsv', sample)
+  read_tsv(quants_file, col_names = c('barcode', 'count')) %>% mutate(sample=sample)
+}
+
+quants = map_dfr(samples, read_sample_barcodes)
+head(quants)
+```
+
+```{r}
+barcodes = barcodes %>% mutate(valid=TRUE)
+quants_filt = left_join(quants, barcodes)
+head(quants_filt)
+```
+
+```{r}
+threshold=50
+quants_filt %>% filter(count>=threshold) %>% count(valid, sample)
+```
+
+
+```{r}
+ggplot(quants_filt) +
+  # geom_density(aes(x=count, color=sample)) +
+  geom_histogram(aes(x=count, color=sample), binwidth=10) +
+  xlim(0,2000) + 
+  # geom_vline(xintercept = threshold) + 
+  facet_wrap(~valid, scales = "free_y", nrow=1, ncol = 2)
+```
+
+
