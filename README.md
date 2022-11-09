@@ -1,6 +1,6 @@
 # Single-cell ATAC alignment + preprocessing for mgatk
 
-This project uses Snakemake to perform alignment + preprocessing of scATAC (or [SHARE-seq](https://github.com/masai1116/SHARE-seq-alignmentV2/)) data, ideally for use with [mgatk](https://github.com/caleblareau/mgatk).
+This project uses Snakemake to perform alignment + preprocessing of scATAC (or [SHARE-seq](https://github.com/masai1116/SHARE-seq-alignmentV2/)) data, ideally for use with [my off-label mgatk fork](https://github.com/logan-blaine/mgatk/tree/barcode_fix)
 
 ## Requirements
 

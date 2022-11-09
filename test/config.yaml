@@ -1,4 +1,5 @@
 sample_file: samples_test.txt
 reference: ref/hg38.fa
 min_barcodes: 1
+barcodes: barcodes.txt
 genome: hg38

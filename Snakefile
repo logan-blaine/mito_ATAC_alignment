@@ -4,10 +4,13 @@ sample_file = config["sample_file"]
 with open(sample_file) as f:
     SAMPLES = [s.strip() for s in f.readlines()]
 
-rule all:
+rule align:
     input: expand('mt-bam/{sample}.bam', sample=SAMPLES)
     # input: expand('mgatk-output/{sample}/final/mgatk.rds', sample=SAMPLES)
     # input: expand('mgatk-output/{sample}/final/barcodeQuants.tsv', sample=SAMPLES)
+
+rule all: 
+    input: expand('mgatk-output/{sample}/final/barcodeQuants.tsv', sample=SAMPLES)
 
 rule bwa_mem_chrM:
     input:
@@ -48,15 +51,15 @@ rule mgatk_bcall:
     input:
         "mt-bam/{sample}.bam"
     output:
-        directory("mgatk-output/{sample}"), 
+        # directory("mgatk-output/{sample}"), 
         "mgatk-output/{sample}/final/barcodeQuants.tsv"
     params:
         genome=config['genome'],
-        outdir = lambda wildcards, output: output[0],
+        outdir = lambda wildcards, output: f'mgatk-output/{wildcards["sample"]}',
         min_barcodes=config['min_barcodes'] if 'min_barcodes' in config else 100,
         barcodes=f'-b {config["barcodes"]}' if 'barcodes' in config else '',
-        num_samples='-ns 512'
-    threads: 1
+        num_samples='-ns 800'
+    threads: 8
     shell:
         "mgatk bcall -i {input} -o {params.outdir} -bt CB"
         " -mb {params.min_barcodes} {params.barcodes} {params.num_samples}"
