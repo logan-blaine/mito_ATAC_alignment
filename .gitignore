@@ -11,3 +11,4 @@ ref
 mgatk-output/
 *.pdf 
 *.nb.html
+counts/

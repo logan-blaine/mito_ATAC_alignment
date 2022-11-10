@@ -10,7 +10,8 @@ rule align:
     # input: expand('mgatk-output/{sample}/final/barcodeQuants.tsv', sample=SAMPLES)
 
 rule all: 
-    input: expand('mgatk-output/{sample}/final/barcodeQuants.tsv', sample=SAMPLES)
+    # input: expand('mgatk-output/{sample}/final/barcodeQuants.tsv', sample=SAMPLES)
+    input: expand('counts/{sample}.coverage.txt.gz', sample=SAMPLES)
 
 rule bwa_mem_chrM:
     input:
@@ -46,21 +47,40 @@ rule samtools_markdup:
         " | samtools markdup -r --barcode-tag CB - {output.bam}"
         " && samtools index {output}"
 
-# in progress: run mgatk on each sample 
-rule mgatk_bcall:
+rule pileup:
     input:
         "mt-bam/{sample}.bam"
     output:
-        # directory("mgatk-output/{sample}"), 
-        "mgatk-output/{sample}/final/barcodeQuants.tsv"
+        "counts/{sample}.coverage.txt.gz",
+        "counts/{sample}.A.txt.gz",
+        "counts/{sample}.C.txt.gz",
+        "counts/{sample}.T.txt.gz",
+        "counts/{sample}.G.txt.gz"
+    log:
+        'logs/pileup/{sample}.log'
     params:
-        genome=config['genome'],
-        outdir = lambda wildcards, output: f'mgatk-output/{wildcards["sample"]}',
-        min_barcodes=config['min_barcodes'] if 'min_barcodes' in config else 100,
-        barcodes=f'-b {config["barcodes"]}' if 'barcodes' in config else '',
-        num_samples='-ns 800'
-    threads: 8
+        sample = lambda wildcards, output: wildcards['sample'],
+        barcodes = config['barcodes'],
+        min_bc = config['min_barcodes']
     shell:
-        "mgatk bcall -i {input} -o {params.outdir} -bt CB"
-        " -mb {params.min_barcodes} {params.barcodes} {params.num_samples}"
-        " -g {params.genome} -kd -c {threads}"
+        "python pileup.py {input} {params.barcodes} {params.min_bc} {params.sample} counts &> {log}"
+
+
+# # in progress: run mgatk on each sample 
+# rule mgatk_bcall:
+#     input:
+#         "mt-bam/{sample}.bam"
+#     output:
+#         # directory("mgatk-output/{sample}"), 
+#         "mgatk-output/{sample}/final/barcodeQuants.tsv"
+#     params:
+#         genome=config['genome'],
+#         outdir = lambda wildcards, output: f'mgatk-output/{wildcards["sample"]}',
+#         min_barcodes=config['min_barcodes'] if 'min_barcodes' in config else 100,
+#         barcodes=f'-b {config["barcodes"]}' if 'barcodes' in config else '',
+#         num_samples='-ns 800'
+#     threads: 8
+#     shell:
+#         "mgatk bcall -i {input} -o {params.outdir} -bt CB"
+#         " -mb {params.min_barcodes} {params.barcodes} {params.num_samples}"
+#         " -g {params.genome} -kd -c {threads}"
